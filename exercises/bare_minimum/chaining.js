@@ -55,7 +55,7 @@ var addNewUserToDatabase = function(user, callback) {
 
 // Chaining lets us get rid of the entire pyramid of doom!!
 
-Promise.promisifyAll(db)
+Promise.promisifyAll(db);
 
 var addNewUserToDatabaseAsync = function(user) {
   // The outermost `return` lets us continue the chain
@@ -79,14 +79,14 @@ var addNewUserToDatabaseAsync = function(user) {
 // Uncomment the lines below and run the example with `node exercises/bare_minimum/chaining.js`
 // It will succeed most of the time, but fail occasionally to demonstrate error handling
 
-// addNewUserToDatabaseAsync({ name: 'Dan', password: 'chickennuggets' })
-//   .then(function(savedUser) {
-//     console.log('All done!')
-//   })
-//   .catch(function(err) {
-//     // Will catch any promise rejections or thrown errors in the chain!
-//     console.log('Oops, caught an error: ', err.message)
-//   });
+addNewUserToDatabaseAsync({ name: 'Dan', password: 'chickennuggets' })
+  .then(function(savedUser) {
+    console.log('All done!')
+  })
+  .catch(function(err) {
+    // Will catch any promise rejections or thrown errors in the chain!
+    console.log('Oops, caught an error: ', err.message)
+  });
 
 /******************************************************************
  *                         Exercises                              *
@@ -102,12 +102,21 @@ var addNewUserToDatabaseAsync = function(user) {
 var pluckFirstLineFromFileAsync = require('./promiseConstructor').pluckFirstLineFromFileAsync;
 var getGitHubProfileAsync = require('./promisification').getGitHubProfileAsync
 
-
+var writeFileAsync = Promise.promisify(fs.writeFile);
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // TODO
+    return pluckFirstLineFromFileAsync(readFilePath)
+    .then(function(username){
+      return getGitHubProfileAsync(username);
+    })
+    .then(function(data){
+      return writeFileAsync(writeFilePath, JSON.stringify(data));
+    })
+    .catch(function(err){
+      console.log(err);
+    });
 };
 
 module.exports = {
   fetchProfileAndWriteToFile: fetchProfileAndWriteToFile
-}
+};
